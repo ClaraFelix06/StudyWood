@@ -64,6 +64,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setSuccessMsg(null);
   };
 
+  const resetAuthFields = () => {
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    resetMessages();
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
@@ -214,7 +221,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             type="button"
             onClick={() => {
               setMode('login');
-              resetMessages();
+              resetAuthFields();
             }}
             className={`py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
               mode === 'login'
@@ -229,7 +236,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             type="button"
             onClick={() => {
               setMode('register');
-              resetMessages();
+              resetAuthFields();
             }}
             className={`py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
               mode === 'register'

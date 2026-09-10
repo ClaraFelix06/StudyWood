@@ -55,6 +55,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     setSuccessMsg(null);
   };
 
+  const resetAuthFields = () => {
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    resetMessages();
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
@@ -217,7 +224,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               id="auth-tab-login"
               onClick={() => {
                 setMode('login');
-                resetMessages();
+                resetAuthFields();
               }}
               className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
                 mode === 'login'
@@ -233,7 +240,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               id="auth-tab-register"
               onClick={() => {
                 setMode('register');
-                resetMessages();
+                resetAuthFields();
               }}
               className={`py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
                 mode === 'register'
@@ -317,7 +324,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   type="button"
                   onClick={() => {
                     setMode('register');
-                    resetMessages();
+                    resetAuthFields();
                   }}
                   className="text-xs text-stone-400 hover:text-emerald-300 transition-colors"
                 >
@@ -538,7 +545,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   type="button"
                   onClick={() => {
                     setMode('login');
-                    resetMessages();
+                    resetAuthFields();
                   }}
                   className="text-xs text-stone-400 hover:text-emerald-300 transition-colors"
                 >

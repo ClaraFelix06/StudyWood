@@ -18,7 +18,8 @@ import {
   loadCurrentUser,
   saveCurrentUser,
   loadProfile,
-  saveProfile
+  saveProfile,
+  clearStudyData
 } from './utils/storage';
 import { 
   Task, 
@@ -351,6 +352,13 @@ export default function App() {
   };
 
   const handleAuthSuccess = (user: UserAccount) => {
+    clearStudyData();
+    setTasks([]);
+    setEvents([]);
+    setSubjects([]);
+    setBuddies([]);
+    setNotes([]);
+    setPhotos([]);
     setCurrentUser(user);
     saveCurrentUser(user);
 

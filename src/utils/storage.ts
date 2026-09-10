@@ -124,6 +124,21 @@ export const saveCurrentUser = (user: UserAccount | null): void => {
   saveStorage(STORAGE_KEYS.CURRENT_USER, user);
 };
 
+export const clearStudyData = (): void => {
+  [
+    STORAGE_KEYS.TASKS,
+    STORAGE_KEYS.SUBJECTS,
+    STORAGE_KEYS.EVENTS,
+    STORAGE_KEYS.BUDDIES,
+    STORAGE_KEYS.NOTES,
+    STORAGE_KEYS.PHOTOS,
+    STORAGE_KEYS.WIDGETS,
+    STORAGE_KEYS.NOTIFICATIONS,
+    STORAGE_KEYS.SYNC_INFO,
+    STORAGE_KEYS.PROFILE,
+  ].forEach((key) => localStorage.removeItem(key));
+};
+
 export const loadProfile = (): StudentProfile => {
   const current = loadCurrentUser();
   if (current) {

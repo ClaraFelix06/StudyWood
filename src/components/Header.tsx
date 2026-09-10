@@ -87,8 +87,8 @@ export const Header: React.FC<HeaderProps> = ({
             <div className={`text-xs md:text-sm font-medium flex flex-col gap-0.5 ${
               isDark ? 'text-emerald-100/95' : 'text-stone-600'
             }`}>
-              <span className="font-semibold">{profile.course}</span>
-              <span>{profile.university}</span>
+              <span className="text-base md:text-lg font-extrabold text-amber-300">{profile.course}</span>
+              <span className="text-sm md:text-base">{profile.university}</span>
             </div>
           </div>
         </div>
@@ -97,13 +97,13 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex flex-wrap items-center gap-2.5 md:gap-3 self-end md:self-auto">
           
           {/* Date & Time Widget */}
-          <div className={`hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-xl border text-xs ${
+          <div className={`hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-xl border text-base ${
             isDark 
               ? 'bg-black/25 backdrop-blur-xs border-white/15 text-white' 
               : 'bg-stone-100 border-stone-200 text-stone-800'
           }`}>
-            <div className={`flex items-center gap-1.5 font-mono font-bold ${isDark ? 'text-white' : 'text-stone-900'}`}>
-              <Clock className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`} />
+            <div className={`flex items-center gap-2 font-mono font-bold ${isDark ? 'text-white' : 'text-stone-900'}`}>
+              <Clock className={`w-5 h-5 ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`} />
               <span>{currentTime}</span>
             </div>
           </div>
