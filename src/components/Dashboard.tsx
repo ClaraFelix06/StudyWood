@@ -33,7 +33,8 @@ import {
   AcademicNote, 
   GalleryPhoto, 
   WidgetConfig, 
-  ThemeConfig 
+  ThemeConfig,
+  TaskType
 } from '../types';
 import { createGoogleCalendarUrl, playNotificationSound } from '../utils/storage';
 import { INITIAL_PROFILE, INITIAL_PHOTOS } from '../data/initialData';
@@ -53,7 +54,7 @@ interface DashboardProps {
   onToggleTaskStatus: (taskId: string) => void;
   onUpdateTaskProgress?: (taskId: string, delta: number) => void;
   onUpdateProgress?: (taskId: string, delta: number) => void;
-  onOpenNewTaskModal: (initialType?: 'tarefa' | 'meta') => void;
+  onOpenNewTaskModal: (initialType?: TaskType) => void;
   onOpenEventModal?: () => void;
   onAddPhoto?: (photo: Omit<GalleryPhoto, 'id' | 'date'>) => void;
 }

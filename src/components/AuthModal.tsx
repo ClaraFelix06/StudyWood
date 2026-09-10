@@ -15,7 +15,8 @@ import {
   ArrowRight, 
   LogIn, 
   UserPlus,
-  BookOpen
+  BookOpen,
+  Upload
 } from 'lucide-react';
 import { UserAccount } from '../types';
 import { AVATAR_PRESETS } from '../data/initialData';
@@ -52,6 +53,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [university, setUniversity] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
 
@@ -140,7 +142,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    const defaultAvatar = AVATAR_PRESETS[0].url;
+    const defaultAvatar = avatarUrl || AVATAR_PRESETS[0].url;
 
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
@@ -149,7 +151,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const result = await signUpWithEmail({ name: name.trim(), email, password, course: course.trim(), period: period.trim(), startDate, endDate, university: university.trim(), avatarUrl: defaultAvatar });
       if (result.emailConfirmationRequired) {
-        setSuccessMsg('Cadastro realizado! Confirme seu email para liberar o acesso.');
+        setSuccessMsg('Cadastro realizado com sucesso!');
         return;
       }
       if (result.account) {
@@ -362,14 +364,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </label>
                 <div className="relative">
                   <Clock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
+                  <select
                     value={period}
                     onChange={(e) => setPeriod(e.target.value)}
-                    placeholder="Ex: 4º Período"
-                    className="w-full pl-10 pr-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-white placeholder:text-stone-500 text-xs focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-white text-xs focus:outline-none focus:border-emerald-500 transition-colors"
                     required
-                  />
+                  >
+                    <option value="">Selecione o período</option>
+                    {Array.from({ length: 12 }, (_, index) => `${index + 1}º Período`).map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
@@ -487,10 +492,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             </div>
 
-            {/* Profile Picture notice */}
-            <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-900/60 text-[11px] text-emerald-300 flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-              <span>A foto de perfil poderá ser alterada exclusivamente nas <strong>Configurações</strong>.</span>
+            <div>
+              <label className="block text-xs font-bold text-stone-300 mb-1">
+                Foto de perfil <span className="font-normal text-stone-500">(opcional)</span>
+              </label>
+              <label className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-stone-300 text-xs cursor-pointer hover:border-emerald-500 transition-colors">
+                <Upload className="w-4 h-4 text-emerald-400" />
+                <span>{avatarUrl ? 'Foto selecionada' : 'Escolher uma foto'}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = () => setAvatarUrl(String(reader.result));
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
             </div>
 
             <button

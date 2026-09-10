@@ -1,5 +1,5 @@
 export type Priority = 'baixa' | 'media' | 'alta';
-export type TaskStatus = 'pendente' | 'em_andamento' | 'concluido';
+export type TaskStatus = 'pendente' | 'em_andamento' | 'concluido' | 'concluida';
 export type TaskType = 'tarefa' | 'prova' | 'trabalho' | 'leitura';
 
 export interface Task {
@@ -18,6 +18,8 @@ export interface Task {
   progressCurrent?: number;
   progressTarget?: number;
   progressUnit?: string;
+  currentCount?: number;
+  targetCount?: number;
   icon?: string;
   createdAt: string;
 }
@@ -57,6 +59,7 @@ export interface Subject {
   credits?: number;
   attendanceTotal?: number;
   attendancePresent?: number;
+  attendanceAttended?: number;
   currentTopics?: SubjectTopic[];
   materials?: SubjectMaterial[];
 }
@@ -71,6 +74,9 @@ export interface AcademicEvent {
   startTime: string; // HH:mm
   endTime: string; // HH:mm
   type: EventType;
+  time?: string;
+  color?: string;
+  description?: string;
   location?: string;
   notes?: string;
   reminderMinutes?: number;

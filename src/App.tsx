@@ -30,7 +30,6 @@ import {
   ThemeConfig, 
   CloudSyncStatus,
   TaskType,
-  FontFamilyOption,
   UserAccount,
   StudentProfile
 } from './types';
@@ -89,13 +88,14 @@ export default function App() {
 
   useEffect(() => {
     if (!isAuthConfigured) {
-      saveCurrentUser(null);
       return;
     }
 
     getAuthenticatedUser().then((user) => {
-      setCurrentUser(user);
-      saveCurrentUser(user);
+      if (user) {
+        setCurrentUser(user);
+        saveCurrentUser(user);
+      }
     });
   }, []);
 
@@ -328,18 +328,6 @@ export default function App() {
     });
   };
 
-  // Cycle typography fonts
-  const handleCycleFont = () => {
-    const fonts: FontFamilyOption[] = ['default', 'handwriting', 'technical'];
-    const currentIndex = fonts.indexOf(theme.fontFamily || 'default');
-    const nextFont = fonts[(currentIndex + 1) % fonts.length];
-    setTheme((prev) => ({
-      ...prev,
-      fontFamily: nextFont,
-      fontStyle: nextFont,
-    }));
-  };
-
   // Profile & User Handlers
   const handleUpdateProfile = (updatedFields: Partial<StudentProfile>) => {
     const updatedProfile: StudentProfile = {
@@ -469,12 +457,8 @@ export default function App() {
               profile={profile}
               theme={theme}
               syncStatus={cloudSync}
-              onOpenSettings={() => setIsSettingsOpen(true)}
-              onOpenAuthModal={() => handleOpenAuth('login')}
               onToggleMobileMenu={() => setMobileMenuOpen(prev => !prev)}
               onOpenMobileMenu={() => setMobileMenuOpen(true)}
-              onOpenNewTaskModal={() => handleOpenNewTaskModal('tarefa')}
-              onCycleFont={handleCycleFont}
             />
 
             {/* Dynamic Views based on activeTab */}

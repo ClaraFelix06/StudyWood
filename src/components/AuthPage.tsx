@@ -14,7 +14,8 @@ import {
   Sparkles, 
   Check, 
   BookOpen, 
-  AlertCircle
+  AlertCircle,
+  Upload
 } from 'lucide-react';
 import { UserAccount } from '../types';
 import { AVATAR_PRESETS } from '../data/initialData';
@@ -45,6 +46,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
 
@@ -132,7 +134,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     }
 
     // Default avatar assigned automatically - altering photo is restricted exclusively to Settings!
-    const defaultAvatar = AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)].url;
+    const defaultAvatar = avatarUrl || AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)].url;
 
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
@@ -141,7 +143,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     try {
       const result = await signUpWithEmail({ name: name.trim(), email, password, course: course.trim(), period: period.trim(), startDate, endDate, university: university.trim(), avatarUrl: defaultAvatar });
       if (result.emailConfirmationRequired) {
-        setSuccessMsg('Cadastro realizado! Confirme seu email para liberar o acesso.');
+        setSuccessMsg('Cadastro realizado com sucesso!');
         return;
       }
       if (result.account) {
@@ -174,7 +176,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       <div className="fixed inset-0 pointer-events-none bg-radial from-emerald-950/20 via-transparent to-black/80" />
 
       {/* Top Brand Bar */}
-      <header className="relative z-10 w-full px-6 py-6 max-w-5xl mx-auto flex items-center justify-between">
+      <header className="relative z-10 w-full px-6 py-6 max-w-5xl mx-auto flex items-center justify-center">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-[#1c2e21] border border-[#2e4d36] flex items-center justify-center text-emerald-300 shadow-md">
             <BookOpen className="w-5 h-5" />
@@ -369,14 +371,17 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   </label>
                   <div className="relative">
                     <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-                    <input
-                      type="text"
+                    <select
                       required
                       value={period}
                       onChange={(e) => setPeriod(e.target.value)}
-                      placeholder="Ex: 4º Período"
-                      className="w-full pl-10 pr-4 py-2 rounded-xl bg-black/40 border border-stone-700 text-white placeholder-stone-500 text-xs focus:outline-none focus:border-emerald-500 transition-colors"
-                    />
+                      className="w-full pl-10 pr-4 py-2 rounded-xl bg-black/40 border border-stone-700 text-white text-xs focus:outline-none focus:border-emerald-500 transition-colors"
+                    >
+                      <option value="">Selecione o período</option>
+                      {Array.from({ length: 12 }, (_, index) => `${index + 1}º Período`).map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -401,7 +406,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-stone-300 mb-1">
-                    Data de Conclusão *
+                    Data de Conclusão ou Previsão *
                   </label>
                   <div className="relative">
                     <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
@@ -496,10 +501,26 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 </div>
               </div>
 
-              {/* Information Note: Photo changed in Settings only */}
-              <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-900/60 text-[11px] text-emerald-300 flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                <span>A foto de perfil poderá ser personalizada posteriormente nas <strong>Configurações</strong> do aplicativo.</span>
+              <div>
+                <label className="block text-xs font-bold text-stone-300 mb-1">
+                  Foto de perfil <span className="font-normal text-stone-500">(opcional)</span>
+                </label>
+                <label className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-black/40 border border-stone-700 text-stone-300 text-xs cursor-pointer hover:border-emerald-500 transition-colors">
+                  <Upload className="w-4 h-4 text-emerald-400" />
+                  <span>{avatarUrl ? 'Foto selecionada' : 'Escolher uma foto'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => setAvatarUrl(String(reader.result));
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
               </div>
 
               <button
