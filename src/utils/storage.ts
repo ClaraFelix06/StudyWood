@@ -19,7 +19,6 @@ import {
   INITIAL_PHOTOS,
   INITIAL_WIDGETS, 
   INITIAL_THEME,
-  INITIAL_USERS,
   INITIAL_PROFILE
 } from '../data/initialData';
 
@@ -114,11 +113,11 @@ export const loadWidgets = (): WidgetConfig[] => loadStorage(STORAGE_KEYS.WIDGET
 export const saveWidgets = (widgets: WidgetConfig[]): void => saveStorage(STORAGE_KEYS.WIDGETS, widgets);
 
 // User Accounts & Authentication
-export const loadUsers = (): UserAccount[] => loadStorage(STORAGE_KEYS.USERS, INITIAL_USERS);
+export const loadUsers = (): UserAccount[] => loadStorage(STORAGE_KEYS.USERS, []);
 export const saveUsers = (users: UserAccount[]): void => saveStorage(STORAGE_KEYS.USERS, users);
 
 export const loadCurrentUser = (): UserAccount | null => {
-  return loadStorage<UserAccount | null>(STORAGE_KEYS.CURRENT_USER, INITIAL_USERS[0]);
+  return loadStorage<UserAccount | null>(STORAGE_KEYS.CURRENT_USER, null);
 };
 
 export const saveCurrentUser = (user: UserAccount | null): void => {

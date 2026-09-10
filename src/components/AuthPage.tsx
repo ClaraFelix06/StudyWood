@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { 
   LogIn, 
   UserPlus, 
@@ -17,8 +17,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { UserAccount } from '../types';
-import { AVATAR_PRESETS, INITIAL_USERS } from '../data/initialData';
-import { loadUsers, saveUsers, saveCurrentUser } from '../utils/storage';
+import { AVATAR_PRESETS } from '../data/initialData';
+import { saveCurrentUser } from '../utils/storage';
+import { isAuthConfigured, signInWithEmail, signUpWithEmail } from '../utils/auth';
 
 interface AuthPageProps {
   onSuccess: (user: UserAccount) => void;
@@ -44,13 +45,15 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   const resetMessages = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
 
@@ -59,27 +62,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    const users = loadUsers();
-    const user = users.find(u => u.email.toLowerCase().trim() === email.toLowerCase().trim());
-
-    if (!user) {
-      setErrorMsg('Nenhuma conta encontrada com este e-mail. Por favor, crie seu cadastro.');
+    if (!isAuthConfigured) {
+      setErrorMsg('A autenticação ainda não está configurada. Consulte o arquivo .env.example.');
       return;
     }
 
-    if (user.password && user.password !== password) {
-      setErrorMsg('Senha incorreta. Verifique e tente novamente.');
-      return;
+    try {
+      const user = await signInWithEmail(email, password);
+      saveCurrentUser(user);
+      setSuccessMsg(`Bem-vindo(a) de volta, ${user.name.split(' ')[0]}!`);
+      setTimeout(() => onSuccess(user), 450);
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : 'Não foi possível entrar. Verifique seus dados.');
     }
-
-    saveCurrentUser(user);
-    setSuccessMsg(`Bem-vindo(a) de volta, ${user.name.split(' ')[0]}!`);
-    setTimeout(() => {
-      onSuccess(user);
-    }, 450);
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
 
@@ -128,48 +126,40 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    const users = loadUsers();
-    const existing = users.find(u => u.email.toLowerCase().trim() === email.toLowerCase().trim());
-    if (existing) {
-      setErrorMsg('Já existe uma conta cadastrada com este e-mail. Faça login ou use outro.');
+    if (!isAuthConfigured) {
+      setErrorMsg('A autenticação ainda não está configurada. Consulte o arquivo .env.example.');
       return;
     }
 
     // Default avatar assigned automatically - altering photo is restricted exclusively to Settings!
     const defaultAvatar = AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)].url;
 
-    const newUser: UserAccount = {
-      id: `usr-${Date.now()}`,
-      name: name.trim(),
-      email: email.toLowerCase().trim(),
-      password,
-      course: course.trim(),
-      period: period.trim(),
-      startDate,
-      endDate,
-      university: university.trim(),
-      avatarUrl: defaultAvatar,
-      registrationNumber: `RA-${Math.floor(100000 + Math.random() * 900000)}`,
-      currentSemester: period.trim(),
-      targetGpa: 5.0,
-      currentGpa: 5.0,
-      createdAt: new Date().toISOString(),
-    };
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
 
-    const updatedUsers = [...users, newUser];
-    saveUsers(updatedUsers);
-    saveCurrentUser(newUser);
-
-    setSuccessMsg(`Cadastro realizado com sucesso! Bem-vindo(a), ${newUser.name}!`);
-    setTimeout(() => {
-      onSuccess(newUser);
-    }, 500);
+    try {
+      const result = await signUpWithEmail({ name: name.trim(), email, password, course: course.trim(), period: period.trim(), startDate, endDate, university: university.trim(), avatarUrl: defaultAvatar });
+      if (result.emailConfirmationRequired) {
+        setSuccessMsg('Cadastro realizado! Confirme seu email para liberar o acesso.');
+        return;
+      }
+      if (result.account) {
+        saveCurrentUser(result.account);
+        setSuccessMsg(`Cadastro realizado com sucesso! Bem-vindo(a), ${result.account.name}!`);
+        setTimeout(() => onSuccess(result.account!), 500);
+      }
+    } catch (error) {
+      setSuccessMsg(null);
+      setErrorMsg(error instanceof Error ? error.message : 'Não foi possível criar sua conta.');
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
+    }
   };
 
   const handleQuickDemoLogin = () => {
-    const demoUser = INITIAL_USERS[0];
-    saveCurrentUser(demoUser);
-    onSuccess(demoUser);
+    setErrorMsg('O acesso demo foi desativado. Cadastre-se com seu email para entrar.');
   };
 
   return (
@@ -200,14 +190,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleQuickDemoLogin}
-          className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-stone-200 hover:text-white transition-colors flex items-center gap-1.5"
-          title="Acessar com a conta pré-configurada de teste"
-        >
-          <span>Acesso Rápido Demo</span>
-        </button>
       </header>
 
       {/* Main Authentication Card */}
@@ -263,19 +245,17 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           </div>
 
           {/* Feedback Alerts */}
-          {errorMsg && (
+          {errorMsg ? (
             <div className="mb-5 p-3 rounded-2xl bg-red-950/70 border border-red-800 text-red-200 text-xs font-medium flex items-center gap-2.5 animate-in fade-in">
               <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
               <span>{errorMsg}</span>
             </div>
-          )}
-
-          {successMsg && (
+          ) : successMsg ? (
             <div className="mb-5 p-3 rounded-2xl bg-emerald-950/70 border border-emerald-700 text-emerald-200 text-xs font-medium flex items-center gap-2.5 animate-in fade-in">
               <Check className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{successMsg}</span>
             </div>
-          )}
+          ) : null}
 
           {/* 1. LOGIN FORM */}
           {mode === 'login' ? (
@@ -525,10 +505,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               <button
                 type="submit"
                 id="submit-register-btn"
+                disabled={isSubmitting}
                 className="w-full mt-3 py-3 px-4 rounded-2xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs tracking-wide transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <UserPlus className="w-4 h-4" />
-                <span>Criar Cadastro & Entrar</span>
+                <span>{isSubmitting ? 'Criando cadastro...' : 'Criar Cadastro & Entrar'}</span>
               </button>
 
               <div className="pt-2 text-center">

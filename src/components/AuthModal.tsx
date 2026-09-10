@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { 
   X, 
   Mail, 
@@ -18,8 +18,9 @@ import {
   BookOpen
 } from 'lucide-react';
 import { UserAccount } from '../types';
-import { AVATAR_PRESETS, INITIAL_USERS } from '../data/initialData';
-import { loadUsers, saveUsers, saveCurrentUser } from '../utils/storage';
+import { AVATAR_PRESETS } from '../data/initialData';
+import { saveCurrentUser } from '../utils/storage';
+import { isAuthConfigured, signInWithEmail, signUpWithEmail } from '../utils/auth';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -51,6 +52,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [university, setUniversity] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   if (!isOpen) return null;
 
@@ -59,7 +62,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setSuccessMsg(null);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
 
@@ -68,27 +71,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    const users = loadUsers();
-    const user = users.find(u => u.email.toLowerCase().trim() === email.toLowerCase().trim());
-
-    if (!user) {
-      setErrorMsg('Usuário não encontrado com este e-mail. Crie uma conta no botão Cadastrar.');
+    if (!isAuthConfigured) {
+      setErrorMsg('A autenticação ainda não está configurada. Consulte o arquivo .env.example.');
       return;
     }
 
-    if (user.password && user.password !== password) {
-      setErrorMsg('Senha incorreta. Verifique os dados digitados.');
-      return;
+    try {
+      const user = await signInWithEmail(email, password);
+      saveCurrentUser(user);
+      setSuccessMsg(`Bem-vindo(a) de volta, ${user.name.split(' ')[0]}!`);
+      setTimeout(() => onSuccess(user), 400);
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : 'Não foi possível entrar. Verifique seus dados.');
     }
-
-    saveCurrentUser(user);
-    setSuccessMsg(`Bem-vindo(a) de volta, ${user.name.split(' ')[0]}!`);
-    setTimeout(() => {
-      onSuccess(user);
-    }, 400);
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
 
@@ -137,47 +135,39 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    const users = loadUsers();
-    const existing = users.find(u => u.email.toLowerCase().trim() === email.toLowerCase().trim());
-    if (existing) {
-      setErrorMsg('Já existe um cadastro com este e-mail. Faça login ou use outro e-mail.');
+    if (!isAuthConfigured) {
+      setErrorMsg('A autenticação ainda não está configurada. Consulte o arquivo .env.example.');
       return;
     }
 
     const defaultAvatar = AVATAR_PRESETS[0].url;
 
-    const newUser: UserAccount = {
-      id: `usr-${Date.now()}`,
-      name: name.trim(),
-      email: email.toLowerCase().trim(),
-      password,
-      course: course.trim(),
-      period: period.trim(),
-      startDate,
-      endDate,
-      university: university.trim(),
-      avatarUrl: defaultAvatar,
-      registrationNumber: `RA-${Math.floor(100000 + Math.random() * 900000)}`,
-      currentSemester: period.trim(),
-      targetGpa: 5.0,
-      currentGpa: 5.0,
-      createdAt: new Date().toISOString(),
-    };
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
 
-    const updatedUsers = [...users, newUser];
-    saveUsers(updatedUsers);
-    saveCurrentUser(newUser);
-
-    setSuccessMsg(`Conta criada com sucesso! Seja bem-vindo(a), ${newUser.name}!`);
-    setTimeout(() => {
-      onSuccess(newUser);
-    }, 500);
+    try {
+      const result = await signUpWithEmail({ name: name.trim(), email, password, course: course.trim(), period: period.trim(), startDate, endDate, university: university.trim(), avatarUrl: defaultAvatar });
+      if (result.emailConfirmationRequired) {
+        setSuccessMsg('Cadastro realizado! Confirme seu email para liberar o acesso.');
+        return;
+      }
+      if (result.account) {
+        saveCurrentUser(result.account);
+        setSuccessMsg(`Conta criada com sucesso! Seja bem-vindo(a), ${result.account.name}!`);
+        setTimeout(() => onSuccess(result.account!), 500);
+      }
+    } catch (error) {
+      setSuccessMsg(null);
+      setErrorMsg(error instanceof Error ? error.message : 'Não foi possível criar sua conta.');
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
+    }
   };
 
   const handleQuickDemoLogin = () => {
-    const defaultUser = INITIAL_USERS[0];
-    saveCurrentUser(defaultUser);
-    onSuccess(defaultUser);
+    setErrorMsg('O acesso demo foi desativado. Cadastre-se com seu email para entrar.');
   };
 
   return (
@@ -251,17 +241,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Status Alerts */}
-        {errorMsg && (
+        {errorMsg ? (
           <div className="mb-4 p-3 rounded-xl bg-red-950/60 border border-red-800 text-red-200 text-xs font-medium animate-in fade-in">
             {errorMsg}
           </div>
-        )}
-        {successMsg && (
+        ) : successMsg ? (
           <div className="mb-4 p-3 rounded-xl bg-emerald-950/70 border border-emerald-700 text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
             <Check className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{successMsg}</span>
           </div>
-        )}
+        ) : null}
 
         {/* ===================== FORMULÁRIO DE LOGIN ===================== */}
         {mode === 'login' ? (
@@ -506,10 +495,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 pt-2.5"
             >
               <UserPlus className="w-4 h-4" />
-              <span>Criar Minha Conta & Acessar</span>
+              <span>{isSubmitting ? 'Criando conta...' : 'Criar Minha Conta & Acessar'}</span>
             </button>
           </form>
         )}

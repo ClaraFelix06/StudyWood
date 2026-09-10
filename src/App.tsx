@@ -35,6 +35,7 @@ import {
   StudentProfile
 } from './types';
 import { INITIAL_PROFILE } from './data/initialData';
+import { getAuthenticatedUser, isAuthConfigured, signOut } from './utils/auth';
 
 // Components
 import { Sidebar } from './components/Sidebar';
@@ -85,6 +86,18 @@ export default function App() {
     pendingSyncCount: 0,
     syncInProgress: false,
   });
+
+  useEffect(() => {
+    if (!isAuthConfigured) {
+      saveCurrentUser(null);
+      return;
+    }
+
+    getAuthenticatedUser().then((user) => {
+      setCurrentUser(user);
+      saveCurrentUser(user);
+    });
+  }, []);
 
   // Apply Theme & Mode to Document (Modo Escuro Permanente)
   useEffect(() => {
@@ -377,12 +390,16 @@ export default function App() {
     setShowLogoutConfirm(true);
   };
 
-  const handleConfirmLogout = () => {
-    saveCurrentUser(null);
-    setCurrentUser(null);
-    setShowLogoutConfirm(false);
-    setIsSettingsOpen(false);
-    setAuthInitialMode('login');
+  const handleConfirmLogout = async () => {
+    try {
+      await signOut();
+    } finally {
+      saveCurrentUser(null);
+      setCurrentUser(null);
+      setShowLogoutConfirm(false);
+      setIsSettingsOpen(false);
+      setAuthInitialMode('login');
+    }
   };
 
   const handleOpenAuth = (mode: 'login' | 'register' = 'login') => {
