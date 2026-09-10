@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .font-handwriting {
+    font-family: 'Patrick Hand', 'Caveat', cursive, sans-serif !important;
+  }
+  .font-technical {
+    font-family: 'JetBrains Mono', 'Space Grotesk', monospace !important;
+  }
+  .font-default {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+  }
+}
+
+/* Custom wooden texture pattern */
+.wood-texture {
+  background-color: #885830;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.05) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2), inset 0 -2px 4px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.wood-sign {
+  border: 4px solid #5a381e;
+  border-radius: 14px;
+  position: relative;
+}
+
+.wood-sign::before, .wood-sign::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #3e2614;
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.wood-sign::before {
+  top: 6px;
+  left: 8px;
+}
+
+.wood-sign::after {
+  top: 6px;
+  right: 8px;
+}
+
+/* Custom cozy scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(70, 100, 75, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(70, 100, 75, 0.5);
+}
+
+/* Smooth transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+

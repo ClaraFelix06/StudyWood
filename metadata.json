@@ -1,0 +1,6 @@
+{
+  "name": "Planner Acadêmico: StudyWood",
+  "description": "Planner acadêmico com tarefas, calendário, mural de registros, gestão de professores e disciplinas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
