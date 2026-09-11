@@ -37,7 +37,7 @@ import {
   TaskType
 } from '../types';
 import { createGoogleCalendarUrl, playNotificationSound } from '../utils/storage';
-import { INITIAL_PROFILE } from '../data/initialData';
+import { EMPTY_PROFILE } from '../data/initialData';
 import { WeeklySchedule } from './WeeklySchedule';
 
 interface DashboardProps {
@@ -61,7 +61,7 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
-  profile = INITIAL_PROFILE,
+  profile = EMPTY_PROFILE,
   tasks,
   subjects,
   events,

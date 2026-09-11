@@ -5,7 +5,7 @@ import {
   
 } from 'lucide-react';
 import { StudentProfile, ThemeConfig } from '../types';
-import { INITIAL_PROFILE } from '../data/initialData';
+import { EMPTY_PROFILE } from '../data/initialData';
 
 interface HeaderProps {
   profile?: StudentProfile;
@@ -17,7 +17,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  profile = INITIAL_PROFILE,
+  profile = EMPTY_PROFILE,
   theme,
   onOpenMobileMenu,
   onToggleMobileMenu,

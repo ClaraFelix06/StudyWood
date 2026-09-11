@@ -34,7 +34,6 @@ import {
   UserAccount,
   StudentProfile
 } from './types';
-import { INITIAL_PROFILE } from './data/initialData';
 import { getAuthenticatedUser, isAuthConfigured, signOut } from './utils/auth';
 
 // Components

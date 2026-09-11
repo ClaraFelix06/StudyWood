@@ -14,7 +14,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { ThemeConfig, StudentProfile } from '../types';
-import { AVATAR_PRESETS, INITIAL_PROFILE } from '../data/initialData';
+import { AVATAR_PRESETS, EMPTY_PROFILE } from '../data/initialData';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -85,7 +85,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   // Restore default avatar
   const handleResetAvatar = () => {
-    onUpdateProfile({ avatarUrl: INITIAL_PROFILE.avatarUrl });
+    onUpdateProfile({ avatarUrl: EMPTY_PROFILE.avatarUrl });
     showFeedback('Foto de perfil restaurada para o padrão.');
   };
 
@@ -149,7 +149,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="flex items-center gap-4 p-3 rounded-xl bg-[#162118] border border-[#273d2a]">
               <div className="relative group">
                 <img
-                  src={profile.avatarUrl || INITIAL_PROFILE.avatarUrl}
+                  src={profile.avatarUrl || undefined}
                   alt={profile.name}
                   className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-500 shadow-md bg-stone-900"
                 />
@@ -295,7 +295,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     {profile.name}
                   </p>
                   <p className="text-[11px] text-stone-400">
-                    {profile.email || 'alexandre@studywood.com'}
+                    {profile.email || 'Sem email cadastrado'}
                   </p>
                 </div>
               </div>

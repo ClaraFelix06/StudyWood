@@ -8,8 +8,7 @@ import {
   WidgetConfig, 
   ThemeConfig, 
   NotificationSettings, 
-  StudentProfile,
-  UserAccount
+  StudentProfile
 } from '../types';
 
 export const AVATAR_PRESETS = [
@@ -55,39 +54,19 @@ export const AVATAR_PRESETS = [
   },
 ];
 
-export const INITIAL_USERS: UserAccount[] = [
-  {
-    id: 'usr-1',
-    name: 'Alexandre Felix',
-    email: 'alexandre@studywood.com',
-    password: '123456',
-    course: 'Ciência da Computação',
-    period: '6º Semestre',
-    startDate: '2022-02-01',
-    endDate: '2025-12-15',
-    university: 'Universidade Federal',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-    registrationNumber: 'DA-1234-5678-9101',
-    currentSemester: '2024.2 • Semestre 6',
-    targetGpa: 5.0,
-    currentGpa: 4.8,
-    createdAt: '2024-08-01T08:00:00.000Z',
-  },
-];
-
-export const INITIAL_PROFILE: StudentProfile = {
-  name: 'Alexandre Felix',
-  email: 'alexandre@studywood.com',
-  course: 'Ciência da Computação',
-  period: '6º Semestre',
-  startDate: '2022-02-01',
-  endDate: '2025-12-15',
-  university: 'Universidade Federal',
-  registrationNumber: 'DA-1234-5678-9101',
-  currentSemester: '2024.2 • Semestre 6',
-  targetGpa: 5.0,
-  currentGpa: 4.8,
-  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+export const EMPTY_PROFILE: StudentProfile = {
+  name: '',
+  email: '',
+  course: '',
+  period: '',
+  startDate: '',
+  endDate: '',
+  university: '',
+  registrationNumber: '',
+  currentSemester: '',
+  targetGpa: 0,
+  currentGpa: 0,
+  avatarUrl: '',
 };
 
 export const INITIAL_SUBJECTS: Subject[] = [

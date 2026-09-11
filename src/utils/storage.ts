@@ -11,15 +11,9 @@ import {
   StudentProfile
 } from '../types';
 import { 
-  INITIAL_TASKS, 
-  INITIAL_SUBJECTS, 
-  INITIAL_EVENTS, 
-  INITIAL_BUDDIES, 
-  INITIAL_NOTES, 
-  INITIAL_PHOTOS,
   INITIAL_WIDGETS, 
   INITIAL_THEME,
-  INITIAL_PROFILE
+  EMPTY_PROFILE
 } from '../data/initialData';
 
 // Storage and integration utilities
@@ -70,32 +64,24 @@ export function loadStorage<T>(key: string, fallback: T): T {
 }
 
 // Typed Loaders & Savers
-export const loadTasks = (): Task[] => loadStorage(STORAGE_KEYS.TASKS, INITIAL_TASKS);
+export const loadTasks = (): Task[] => loadStorage(STORAGE_KEYS.TASKS, []);
 export const saveTasks = (tasks: Task[]): void => saveStorage(STORAGE_KEYS.TASKS, tasks);
 
-export const loadEvents = (): AcademicEvent[] => loadStorage(STORAGE_KEYS.EVENTS, INITIAL_EVENTS);
+export const loadEvents = (): AcademicEvent[] => loadStorage(STORAGE_KEYS.EVENTS, []);
 export const saveEvents = (events: AcademicEvent[]): void => saveStorage(STORAGE_KEYS.EVENTS, events);
 
 export const loadSubjects = (): Subject[] => {
-  const loaded = loadStorage<Subject[]>(STORAGE_KEYS.SUBJECTS, INITIAL_SUBJECTS);
-  return loaded.map(sub => {
-    const initialMatch = INITIAL_SUBJECTS.find(init => init.id === sub.id);
-    return {
-      ...sub,
-      currentTopics: sub.currentTopics || initialMatch?.currentTopics || [],
-      materials: sub.materials || initialMatch?.materials || [],
-    };
-  });
+  return loadStorage<Subject[]>(STORAGE_KEYS.SUBJECTS, []);
 };
 export const saveSubjects = (subjects: Subject[]): void => saveStorage(STORAGE_KEYS.SUBJECTS, subjects);
 
-export const loadBuddies = (): StudyBuddy[] => loadStorage(STORAGE_KEYS.BUDDIES, INITIAL_BUDDIES);
+export const loadBuddies = (): StudyBuddy[] => loadStorage(STORAGE_KEYS.BUDDIES, []);
 export const saveBuddies = (buddies: StudyBuddy[]): void => saveStorage(STORAGE_KEYS.BUDDIES, buddies);
 
-export const loadNotes = (): AcademicNote[] => loadStorage(STORAGE_KEYS.NOTES, INITIAL_NOTES);
+export const loadNotes = (): AcademicNote[] => loadStorage(STORAGE_KEYS.NOTES, []);
 export const saveNotes = (notes: AcademicNote[]): void => saveStorage(STORAGE_KEYS.NOTES, notes);
 
-export const loadPhotos = (): GalleryPhoto[] => loadStorage(STORAGE_KEYS.PHOTOS, INITIAL_PHOTOS);
+export const loadPhotos = (): GalleryPhoto[] => loadStorage(STORAGE_KEYS.PHOTOS, []);
 export const savePhotos = (photos: GalleryPhoto[]): void => saveStorage(STORAGE_KEYS.PHOTOS, photos);
 
 export const loadThemeConfig = (): ThemeConfig => {
@@ -157,7 +143,7 @@ export const loadProfile = (): StudentProfile => {
       avatarUrl: current.avatarUrl,
     };
   }
-  return loadStorage(STORAGE_KEYS.PROFILE, INITIAL_PROFILE);
+  return loadStorage(STORAGE_KEYS.PROFILE, EMPTY_PROFILE);
 };
 
 export const saveProfile = (profile: StudentProfile): void => {

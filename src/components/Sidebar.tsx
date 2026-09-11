@@ -13,7 +13,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { ThemeConfig, StudentProfile } from '../types';
-import { DAILY_TIPS, INITIAL_PROFILE } from '../data/initialData';
+import { DAILY_TIPS, EMPTY_PROFILE } from '../data/initialData';
 
 export type NavTab = 
   | 'dashboard' 
@@ -48,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
     theme,
     onOpenSettings,
     onToggleThemeMode,
-    profile = INITIAL_PROFILE,
+    profile = EMPTY_PROFILE,
     onOpenAuthModal,
     onLogout,
   } = props;
@@ -161,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
         <div className="p-2.5 rounded-2xl bg-black/30 border border-stone-800/80 flex items-center gap-2.5">
           <div className="relative shrink-0">
             <img
-              src={profile.avatarUrl || INITIAL_PROFILE.avatarUrl}
+              src={profile.avatarUrl || undefined}
               alt={profile.name}
               className="w-10 h-10 rounded-xl object-cover border border-emerald-500 bg-stone-800"
             />
