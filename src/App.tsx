@@ -19,7 +19,9 @@ import {
   saveCurrentUser,
   loadProfile,
   saveProfile,
-  clearStudyData
+  clearStudyData,
+  loadWeeklyClasses,
+  saveWeeklyClasses
 } from './utils/storage';
 import { 
   Task, 
@@ -32,7 +34,8 @@ import {
   CloudSyncStatus,
   TaskType,
   UserAccount,
-  StudentProfile
+  StudentProfile,
+  WeeklyClass
 } from './types';
 import { getAuthenticatedUser, isAuthConfigured, signOut } from './utils/auth';
 
@@ -68,6 +71,7 @@ export default function App() {
   const [buddies, setBuddies] = useState<StudyBuddy[]>(loadBuddies);
   const [notes, setNotes] = useState<AcademicNote[]>(loadNotes);
   const [photos, setPhotos] = useState<GalleryPhoto[]>(loadPhotos);
+  const [weeklyClasses, setWeeklyClasses] = useState<WeeklyClass[]>(loadWeeklyClasses);
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -358,6 +362,7 @@ export default function App() {
     setBuddies([]);
     setNotes([]);
     setPhotos([]);
+    setWeeklyClasses([]);
     setCurrentUser(user);
     saveCurrentUser(user);
 
@@ -486,6 +491,7 @@ export default function App() {
                 onNavigate={setActiveTab}
                 onNavigateToTab={setActiveTab}
                 onAddPhoto={handleAddPhoto}
+                weeklyClasses={weeklyClasses}
               />
             )}
 
@@ -494,6 +500,10 @@ export default function App() {
                 events={events}
                 tasks={tasks}
                 subjects={subjects}
+                buddies={buddies}
+                weeklyClasses={weeklyClasses}
+                onAddWeeklyClass={(item) => setWeeklyClasses((prev) => { const updated = [...prev, { ...item, id: `class-${Date.now()}` }]; saveWeeklyClasses(updated); return updated; })}
+                onDeleteWeeklyClass={(id) => setWeeklyClasses((prev) => { const updated = prev.filter((item) => item.id !== id); saveWeeklyClasses(updated); return updated; })}
                 theme={theme}
                 onAddEvent={handleAddEvent}
                 onDeleteEvent={handleDeleteEvent}

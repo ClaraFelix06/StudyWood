@@ -14,7 +14,7 @@ import {
   Sparkles,
   Link2
 } from 'lucide-react';
-import { AcademicEvent, Subject, Task, ThemeConfig } from '../types';
+import { AcademicEvent, Subject, Task, ThemeConfig, StudyBuddy, WeeklyClass } from '../types';
 import { createGoogleCalendarUrl, exportToICS } from '../utils/storage';
 import { WeeklySchedule } from './WeeklySchedule';
 
@@ -22,18 +22,26 @@ interface CalendarViewProps {
   events: AcademicEvent[];
   tasks: Task[];
   subjects: Subject[];
+  buddies: StudyBuddy[];
+  weeklyClasses: WeeklyClass[];
   theme: ThemeConfig;
   onAddEvent: (event: Omit<AcademicEvent, 'id'>) => void;
   onDeleteEvent: (id: string) => void;
+  onAddWeeklyClass: (item: Omit<WeeklyClass, 'id'>) => void;
+  onDeleteWeeklyClass: (id: string) => void;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
   events,
   tasks,
   subjects,
+  buddies,
+  weeklyClasses,
   theme,
   onAddEvent,
   onDeleteEvent,
+  onAddWeeklyClass,
+  onDeleteWeeklyClass,
 }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<string>(
@@ -54,6 +62,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const [newEventLocation, setNewEventLocation] = useState('Campus Central');
   const [newEventNotes, setNewEventNotes] = useState('');
   const [newEventReminder, setNewEventReminder] = useState(60);
+  const [showWeeklyClassForm, setShowWeeklyClassForm] = useState(false);
+  const [weeklyWeekday, setWeeklyWeekday] = useState(1);
+  const [weeklySubjectId, setWeeklySubjectId] = useState(subjects[0]?.id || '');
+  const [weeklyBuddyId, setWeeklyBuddyId] = useState('');
+  const [weeklyStartTime, setWeeklyStartTime] = useState('08:00');
+  const [weeklyEndTime, setWeeklyEndTime] = useState('10:00');
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -98,6 +112,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
     setNewEventTitle('');
     setShowAddModal(false);
+  };
+
+  const handleCreateWeeklyClass = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!weeklySubjectId) return;
+    onAddWeeklyClass({
+      weekday: weeklyWeekday,
+      subjectId: weeklySubjectId,
+      buddyId: weeklyBuddyId || undefined,
+      startTime: weeklyStartTime,
+      endTime: weeklyEndTime,
+    });
+    setShowWeeklyClassForm(false);
   };
 
   // Selected Day Items
@@ -299,6 +326,56 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           </div>
         </div>
 
+        <div className="lg:col-span-3">
+          <WeeklySchedule classes={weeklyClasses} subjects={subjects} buddies={buddies} theme={theme} />
+          <div className="mt-4 rounded-3xl p-5 border shadow-xs bg-white dark:bg-[#1c241e] border-stone-200 dark:border-[#2a382d]">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-extrabold text-stone-900 dark:text-stone-100">Definir dias de aula</h3>
+                <p className="text-xs text-stone-500 dark:text-stone-400">Cadastre aulas fixas sem associá-las a uma data específica.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowWeeklyClassForm((value) => !value)}
+                className="px-3 py-2 rounded-xl bg-[#234d32] text-white text-xs font-bold"
+              >
+                {showWeeklyClassForm ? 'Fechar' : 'Definir aula'}
+              </button>
+            </div>
+
+            {showWeeklyClassForm && (
+              <form onSubmit={handleCreateWeeklyClass} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
+                <select value={weeklyWeekday} onChange={(event) => setWeeklyWeekday(Number(event.target.value))} className="px-3 py-2 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs" aria-label="Dia da semana">
+                  <option value={1}>Segunda-feira</option><option value={2}>Terça-feira</option><option value={3}>Quarta-feira</option><option value={4}>Quinta-feira</option><option value={5}>Sexta-feira</option>
+                </select>
+                <select required value={weeklySubjectId} onChange={(event) => setWeeklySubjectId(event.target.value)} className="px-3 py-2 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs" aria-label="Disciplina">
+                  <option value="">Selecione a disciplina</option>
+                  {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
+                </select>
+                <select value={weeklyBuddyId} onChange={(event) => setWeeklyBuddyId(event.target.value)} className="px-3 py-2 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs" aria-label="Professor opcional">
+                  <option value="">Professor (opcional)</option>
+                  {buddies.map((buddy) => <option key={buddy.id} value={buddy.id}>{buddy.name}</option>)}
+                </select>
+                <div className="flex gap-2">
+                  <input type="time" value={weeklyStartTime} onChange={(event) => setWeeklyStartTime(event.target.value)} className="w-full px-2 py-2 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs" aria-label="Horário inicial" />
+                  <input type="time" value={weeklyEndTime} onChange={(event) => setWeeklyEndTime(event.target.value)} className="w-full px-2 py-2 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs" aria-label="Horário final" />
+                </div>
+                <button type="submit" disabled={!subjects.length} className="px-3 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold disabled:opacity-40">Salvar aula</button>
+              </form>
+            )}
+
+            {weeklyClasses.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {weeklyClasses.map((item) => (
+                  <button key={item.id} type="button" onClick={() => onDeleteWeeklyClass(item.id)} className="px-2.5 py-1.5 rounded-lg bg-stone-100 dark:bg-stone-900 text-[11px] text-stone-700 dark:text-stone-300 hover:text-red-500" title="Remover aula fixa">
+                    {['', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex'][item.weekday]} · {subjects.find((subject) => subject.id === item.subjectId)?.name || 'Disciplina'} · {item.startTime}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Selected Day Agenda & Google Calendar Action */}
         <div 
           className="p-5 rounded-3xl border shadow-xs flex flex-col justify-between"
@@ -309,7 +386,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         >
           <div>
 
-          <WeeklySchedule events={events} subjects={subjects} theme={theme} />
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 mb-4">
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#234d32] dark:text-emerald-400">

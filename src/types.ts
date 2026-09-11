@@ -83,6 +83,15 @@ export interface AcademicEvent {
   googleEventId?: string;
 }
 
+export interface WeeklyClass {
+  id: string;
+  weekday: number;
+  subjectId: string;
+  buddyId?: string;
+  startTime: string;
+  endTime: string;
+}
+
 export interface StudyBuddy {
   id: string;
   name: string;

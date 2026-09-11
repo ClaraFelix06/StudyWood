@@ -8,7 +8,8 @@ import {
   WidgetConfig, 
   ThemeConfig,
   UserAccount,
-  StudentProfile
+  StudentProfile,
+  WeeklyClass
 } from '../types';
 import { 
   INITIAL_WIDGETS, 
@@ -32,6 +33,7 @@ const STORAGE_KEYS = {
   SYNC_INFO: 'studywood_sync_info_v2',
   USERS: 'studywood_users_v2',
   CURRENT_USER: 'studywood_current_user_v2',
+  WEEKLY_CLASSES: 'studywood_weekly_classes_v1',
 };
 
 export { STORAGE_KEYS };
@@ -69,6 +71,9 @@ export const saveTasks = (tasks: Task[]): void => saveStorage(STORAGE_KEYS.TASKS
 
 export const loadEvents = (): AcademicEvent[] => loadStorage(STORAGE_KEYS.EVENTS, []);
 export const saveEvents = (events: AcademicEvent[]): void => saveStorage(STORAGE_KEYS.EVENTS, events);
+
+export const loadWeeklyClasses = (): WeeklyClass[] => loadStorage(STORAGE_KEYS.WEEKLY_CLASSES, []);
+export const saveWeeklyClasses = (classes: WeeklyClass[]): void => saveStorage(STORAGE_KEYS.WEEKLY_CLASSES, classes);
 
 export const loadSubjects = (): Subject[] => {
   return loadStorage<Subject[]>(STORAGE_KEYS.SUBJECTS, []);
@@ -115,6 +120,7 @@ export const clearStudyData = (): void => {
     STORAGE_KEYS.TASKS,
     STORAGE_KEYS.SUBJECTS,
     STORAGE_KEYS.EVENTS,
+    STORAGE_KEYS.WEEKLY_CLASSES,
     STORAGE_KEYS.BUDDIES,
     STORAGE_KEYS.NOTES,
     STORAGE_KEYS.PHOTOS,

@@ -34,7 +34,8 @@ import {
   GalleryPhoto, 
   WidgetConfig, 
   ThemeConfig,
-  TaskType
+  TaskType,
+  WeeklyClass
 } from '../types';
 import { createGoogleCalendarUrl, playNotificationSound } from '../utils/storage';
 import { EMPTY_PROFILE } from '../data/initialData';
@@ -46,6 +47,7 @@ interface DashboardProps {
   subjects: Subject[];
   events: AcademicEvent[];
   buddies: StudyBuddy[];
+  weeklyClasses: WeeklyClass[];
   notes: AcademicNote[];
   photos?: GalleryPhoto[];
   widgets?: WidgetConfig[];
@@ -66,6 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   subjects,
   events,
   buddies,
+  weeklyClasses,
   notes,
   photos = [],
   theme,
@@ -410,7 +413,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </section>
 
-      <WeeklySchedule events={events} subjects={subjects} theme={theme} />
+      <WeeklySchedule classes={weeklyClasses} subjects={subjects} buddies={buddies} theme={theme} />
 
       {/* =========================================================================
           2. ABAIXO DO CALENDÁRIO: METAS E MURAL (GALERIA) LADO A LADO
