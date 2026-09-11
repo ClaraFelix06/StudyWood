@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { AcademicEvent, Subject, Task, ThemeConfig } from '../types';
 import { createGoogleCalendarUrl, exportToICS } from '../utils/storage';
+import { WeeklySchedule } from './WeeklySchedule';
 
 interface CalendarViewProps {
   events: AcademicEvent[];
@@ -144,7 +145,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-xl">📅</span>
             <h2 className="text-xl font-extrabold tracking-tight text-stone-900 dark:text-emerald-300">
-              Calendário Acadêmico & Google Calendar
+              Agenda Acadêmica & Google Calendar
             </h2>
           </div>
           <p className="text-xs text-stone-600 dark:text-stone-300 mt-1">
@@ -307,6 +308,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           }}
         >
           <div>
+
+          <WeeklySchedule events={events} subjects={subjects} theme={theme} />
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 mb-4">
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#234d32] dark:text-emerald-400">

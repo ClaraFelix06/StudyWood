@@ -37,7 +37,8 @@ import {
   TaskType
 } from '../types';
 import { createGoogleCalendarUrl, playNotificationSound } from '../utils/storage';
-import { INITIAL_PROFILE, INITIAL_PHOTOS } from '../data/initialData';
+import { INITIAL_PROFILE } from '../data/initialData';
+import { WeeklySchedule } from './WeeklySchedule';
 
 interface DashboardProps {
   profile?: StudentProfile;
@@ -66,7 +67,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   events,
   buddies,
   notes,
-  photos = INITIAL_PHOTOS,
+  photos = [],
   theme,
   onNavigate,
   onNavigateToTab,
@@ -90,7 +91,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [expandedPhoto, setExpandedPhoto] = useState<GalleryPhoto | null>(null);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
-  const displayPhotos = photos.length > 0 ? photos : INITIAL_PHOTOS;
+  const displayPhotos = photos;
   const currentPhoto = displayPhotos[activePhotoIndex % displayPhotos.length];
 
   // Calendar calculations
@@ -409,6 +410,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </section>
 
+      <WeeklySchedule events={events} subjects={subjects} theme={theme} />
+
       {/* =========================================================================
           2. ABAIXO DO CALENDÁRIO: METAS E MURAL (GALERIA) LADO A LADO
           ========================================================================= */}
@@ -558,17 +561,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </p>
                 </div>
               </div>
-              <button 
-                onClick={() => navigate('gallery')}
-                className="text-xs font-bold text-[#234d32] dark:text-emerald-400 hover:underline flex items-center gap-1"
-              >
-                <span>Abrir Mural</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
             </div>
 
             {/* Featured Photo with Description */}
-            {currentPhoto && (
+            {currentPhoto ? (
               <div className="space-y-3">
                 <div 
                   className="relative aspect-16/9 rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-800 group cursor-pointer"
@@ -637,16 +633,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="min-h-32 rounded-2xl border border-dashed border-stone-300 dark:border-stone-700 flex items-center justify-center text-center px-4">
+                <p className="text-sm font-semibold text-stone-500 dark:text-stone-400">Ainda não há fotos no seu mural</p>
+              </div>
             )}
           </div>
-
-          <button
-            onClick={() => navigate('gallery')}
-            className="w-full mt-4 py-2.5 px-4 rounded-2xl bg-[#234d32] hover:bg-[#1a3d27] text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Adicionar Foto ao Mural</span>
-          </button>
         </div>
       </section>
 

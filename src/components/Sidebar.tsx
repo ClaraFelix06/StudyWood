@@ -76,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
   // 100% em português brasileiro, sem 'overview' e sem 'widgets'
   const navItems = [
     { id: 'dashboard', label: 'Início', sub: 'Painel Principal', icon: Home },
-    { id: 'calendar', label: 'Calendário', sub: 'Prazos & Aulas', icon: CalendarIcon },
+    { id: 'calendar', label: 'Agenda', sub: 'Prazos & Aulas', icon: CalendarIcon },
     { id: 'tasks', label: 'Tarefas', sub: 'Lista & Entregas', icon: CheckSquare },
     { id: 'gallery', label: 'Mural', sub: 'Fotos & Registros', icon: ImageIcon },
     { id: 'buddies', label: 'Professores', sub: 'Contatos & Emails', icon: Users },

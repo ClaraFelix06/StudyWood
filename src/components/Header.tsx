@@ -62,6 +62,9 @@ export const Header: React.FC<HeaderProps> = ({
       <div className={`relative z-10 px-5 py-4 md:px-7 md:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
         isDark ? 'text-white' : 'text-stone-900'
       }`}>
+        <div className="hidden md:block absolute left-1/2 -translate-x-1/2 text-base font-semibold italic text-emerald-200/80">
+          O que iremos fazer hoje?
+        </div>
         
         {/* Left Side: Mobile Menu Button + Greetings */}
         <div className="flex items-center gap-3.5">

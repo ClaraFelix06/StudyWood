@@ -169,7 +169,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
                         onDeleteNote(note.id);
                       }
                     }}
-                    className="opacity-0 group-hover:opacity-100 text-stone-500 hover:text-red-500 transition-opacity p-0.5"
+                    className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors p-0.5"
                     title="Excluir nota"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
